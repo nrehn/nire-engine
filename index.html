@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090b">
+<title>Nire Engine – Engine sound for your EV</title>
+<meta name="description" content="Synthesized engine sounds that follow your speed. Open it in your car's browser and drive.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="is-off">
+
+<div class="backdrop" aria-hidden="true"><div class="backdrop-glow"></div></div>
+
+<header class="topbar">
+  <div class="brand"><img src="icon.svg" alt="" width="28" height="28"><span>NIRE<b>ENGINE</b></span></div>
+  <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-haspopup="dialog">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<main class="cluster">
+  <div class="gauge">
+    <canvas id="tach" role="img" aria-label="Tachometer"></canvas>
+    <div class="readout">
+      <div class="gear" id="gearOut" aria-label="Gear">N</div>
+      <div class="speed"><span id="speedOut">0</span><small>km/h</small></div>
+      <div class="rpm-text"><span id="rpmOut">0</span> rpm</div>
+    </div>
+  </div>
+  <div class="status" id="statusOut" role="status" aria-live="polite"></div>
+</main>
+
+<!-- Start panel: engine picker + start button -->
+<section class="start" id="startPanel" aria-label="Choose engine and start">
+  <div class="engine-grid" id="engineGrid" role="radiogroup" aria-label="Engine"></div>
+  <button class="start-btn" id="startBtn">START</button>
+  <p class="hint">Press start while the car is standing still. Turn the car volume up.</p>
+</section>
+
+<!-- Dock while running -->
+<div class="dock" id="dock" hidden>
+  <button class="gas-btn" id="gasBtn" hidden>Hold to rev</button>
+  <button class="stop-btn" id="stopBtn">Stop engine</button>
+</div>
+
+<!-- GPS explainer, shown once before the browser permission prompt -->
+<dialog id="gpsDialog" class="sheet">
+  <h2>Nire Engine follows your speed</h2>
+  <p>Engine revs and gear changes are driven by GPS speed. Press <b>Allow</b> when the browser asks for your location.</p>
+  <p class="fine">Your location never leaves this device. Nothing is stored or sent anywhere.</p>
+  <div class="row">
+    <button class="btn primary" id="gpsContinue">Continue</button>
+    <button class="btn" id="gpsSkip">Start without GPS</button>
+  </div>
+</dialog>
+
+<!-- Menu -->
+<dialog id="menuDialog" class="sheet">
+  <h2>Settings</h2>
+
+  <fieldset class="field">
+    <legend>Drive mode</legend>
+    <div class="seg" role="radiogroup">
+      <label><input type="radio" name="mode" value="comfort" checked><span>Comfort</span></label>
+      <label><input type="radio" name="mode" value="sport"><span>Sport</span></label>
+    </div>
+    <p class="fine">Sport holds gears longer for more sound around town.</p>
+  </fieldset>
+
+  <label class="field toggle">
+    <input type="checkbox" id="demoToggle">
+    <span>Demo drive <small>(simulated trip, no GPS)</small></span>
+  </label>
+
+  <label class="field">
+    <span>Volume</span>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
+  </label>
+
+  <div class="field">
+    <span>GPS</span>
+    <output id="gpsStatus">Not started</output>
+  </div>
+
+  <div class="field">
+    <span>No sound?</span>
+    <button class="btn" id="beepBtn">Play test tone</button>
+  </div>
+
+  <form method="dialog" class="row"><button class="btn primary">Done</button></form>
+</dialog>
+
+<script src="js/engines.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/drivetrain.js"></script>
+<script src="js/speed.js"></script>
+<script src="js/gauge.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
