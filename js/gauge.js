@@ -3,8 +3,26 @@ class Tach {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.gauge = canvas.parentElement;
+    this.cluster = canvas.closest('.cluster');
+    this.fit();
+    // Refit whenever the free space changes (window resize, start panel shown/hidden)
+    if ('ResizeObserver' in window) new ResizeObserver(() => this.fit()).observe(this.cluster);
+    window.addEventListener('resize', () => this.fit());
+  }
+
+  /** Size the gauge to the largest square that fits the cluster area (below the bar, above the buttons). */
+  fit() {
+    const status = this.cluster.querySelector('.status');
+    const freeH = this.cluster.clientHeight - (status ? status.offsetHeight : 0) - 16;
+    const freeW = this.cluster.clientWidth * 0.92;
+    const size = Math.max(140, Math.min(freeH, freeW, 640));
+    if (size !== this.lastSize) {
+      this.lastSize = size;
+      this.gauge.style.setProperty('--gauge', `${size}px`);
+    }
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    if (this.lastDraw) this.draw(...this.lastDraw);
   }
 
   resize() {
@@ -16,6 +34,7 @@ class Tach {
   }
 
   draw(rpm, profile, on) {
+    this.lastDraw = [rpm, profile, on];
     const c = this.ctx, s = this.size, cx = this.canvas.width / 2, cy = this.canvas.height / 2;
     const R = s * 0.46;
     const max = Math.ceil(profile.limiter / 1000) * 1000 + 1000;

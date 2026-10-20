@@ -87,6 +87,7 @@
     running = true;
     document.body.classList.replace('is-off', 'is-on');
     $('dock').hidden = false;
+    tach.fit(); // start panel hidden -> more room for the gauge
     requestWakeLock();
     lastFrame = performance.now();
     requestAnimationFrame(loop);
@@ -100,6 +101,7 @@
     document.body.classList.replace('is-on', 'is-off');
     $('dock').hidden = true;
     $('gasBtn').hidden = true;
+    tach.fit(); // start panel back -> shrink the gauge again
     document.documentElement.style.setProperty('--rev', 0);
     $('speedOut').textContent = '0';
     $('gearOut').textContent = 'N';
@@ -124,7 +126,11 @@
     tach.draw(rpm, profile, true);
 
     const stopped = s.v < STANDSTILL;
-    $('gasBtn').hidden = !stopped || useDemo;
+    const showGas = stopped && !useDemo;
+    if ($('gasBtn').hidden === showGas) {
+      $('gasBtn').hidden = !showGas;
+      tach.fit(); // dock height may change
+    }
     if (!stopped && gasHeld) releaseGas();
 
     // Only touch the DOM when the text actually changes

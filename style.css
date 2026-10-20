@@ -19,7 +19,8 @@ body {
   background: var(--bg);
   color: var(--text);
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  /* minmax(0, 1fr): the cluster row gets only the space left over, never pushes the start panel */
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -55,30 +56,35 @@ body {
 .icon-btn svg { width: 24px; height: 24px; }
 
 /* Cluster */
-.cluster { display: grid; place-items: center; align-content: center; gap: 8px; min-height: 0; }
+.cluster { display: grid; place-items: center; align-content: center; gap: 8px; min-height: 0; overflow: hidden; }
 .gauge {
+  /* --gauge is set from JS to fit the free space; the fallback is used before JS runs */
+  --gauge: min(72vh, 92vw, 640px);
   position: relative;
-  width: min(72vh, 92vw, 640px);
+  width: var(--gauge);
   aspect-ratio: 1;
+  pointer-events: none; /* display only: never steal taps from the buttons */
 }
 .gauge canvas { width: 100%; height: 100%; display: block; }
 .readout {
   position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 2px;
   pointer-events: none;
 }
+/* Readout scales with the gauge, so it also fits on short screens */
 .gear {
-  font-size: clamp(28px, 7vh, 56px); font-weight: 800; color: var(--accent);
+  font-size: calc(var(--gauge) * .09); font-weight: 800; color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
-.speed span { font-size: clamp(56px, 15vh, 128px); font-weight: 700; line-height: .95; font-variant-numeric: tabular-nums; }
-.speed small { display: block; color: var(--muted); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; }
-.rpm-text { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; margin-top: 6px; }
+.speed span { font-size: calc(var(--gauge) * .21); font-weight: 700; line-height: .95; font-variant-numeric: tabular-nums; }
+.speed small { display: block; color: var(--muted); font-size: max(11px, calc(var(--gauge) * .024)); letter-spacing: .2em; text-transform: uppercase; }
+.rpm-text { color: var(--muted); font-size: max(11px, calc(var(--gauge) * .022)); font-variant-numeric: tabular-nums; margin-top: 6px; }
 .status { min-height: 1.4em; color: var(--muted); font-size: 14px; text-align: center; padding: 0 16px; }
 
 body.is-off .gauge { opacity: .35; filter: saturate(.4); transition: opacity .4s, filter .4s; }
 
 /* Start panel */
 .start {
+  position: relative; z-index: 2; /* always above the gauge */
   display: grid; justify-items: center; gap: 14px;
   padding: 0 16px max(20px, env(safe-area-inset-bottom));
 }
@@ -110,6 +116,7 @@ body.is-on .start { display: none; }
 
 /* Dock */
 .dock {
+  position: relative; z-index: 2;
   display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
   padding: 0 16px max(20px, env(safe-area-inset-bottom));
 }
